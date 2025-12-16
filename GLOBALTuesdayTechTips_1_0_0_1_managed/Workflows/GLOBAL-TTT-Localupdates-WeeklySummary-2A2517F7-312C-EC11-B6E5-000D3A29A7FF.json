@@ -1,0 +1,292 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 2,
+            "timeZone": "GMT Standard Time",
+            "schedule": {
+              "weekDays": [
+                "Monday"
+              ],
+              "hours": [
+                "9"
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "d6529e55-e9db-48eb-a844-2eacfd0b143b"
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Get_items": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "542c1b3a-4df4-4411-b2b7-fa51477749fe"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+              "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+              "folderPath": "/Lists/TTT  Local updates"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runtimeConfiguration": {
+            "paginationPolicy": {
+              "minimumItemCount": 50000
+            }
+          }
+        },
+        "Filter_array": {
+          "runAfter": {
+            "Get_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6c949063-44e2-466a-a1da-2a96592c1ab7"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@outputs('Get_items')?['body/value']",
+            "where": "@and(greaterOrEquals(item()?['Date'], utcNow()),less(item()?['Date'], addDays(utcNow(), 15)))"
+          },
+          "description": "Filter by dates within the next 2 weeks"
+        },
+        "Filter_array_-_IT_Training": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0c2c3999-4045-41ba-b1dc-400c362abe5d"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Filter_array')",
+            "where": "@equals(item()?['Update/Value'], 'IT Training')"
+          }
+        },
+        "Select_-_IT_Training": {
+          "runAfter": {
+            "Filter_array_-_IT_Training": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5496c955-d385-4686-b77b-c1b03ab35837"
+          },
+          "type": "Select",
+          "inputs": {
+            "from": "@split(string(body('Filter_array_-_IT_Training')), '},{')",
+            "select": {
+              "Zone": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'ZONE')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Country": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'Country')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Date": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'Date')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Name": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'Name_x002f_Title')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Description": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'Description')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Location": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'Location')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Link to item": "@replace(replace(replace(split(split(string(body('Filter_array_-_IT_Training')),'Link')[1],',')[0], '\\', ''), ':', ''), '\"', '')"
+            }
+          }
+        },
+        "Filter_array_-_Local_Update": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "72695537-6a96-4870-884f-ca4a5d32d8b8"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Filter_array')",
+            "where": "@equals(item()?['Update/Value'], 'Local update')"
+          }
+        },
+        "Select_-_Local_Update": {
+          "runAfter": {
+            "Filter_array_-_Local_Update": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "326ad0cf-c3f5-4af1-9dfd-b928b4d26ad4"
+          },
+          "type": "Select",
+          "inputs": {
+            "from": "@body('Filter_array_-_Local_Update')",
+            "select": {
+              "Zone": "@replace(replace(replace(split(split(string(body('Filter_array_-_Local_Update')),'ZONE')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Country": "@replace(replace(replace(split(split(string(body('Filter_array_-_Local_Update')),'Country')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Date": "@replace(replace(replace(split(split(string(body('Filter_array_-_Local_Update')),'Date')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Name": "@replace(replace(replace(split(split(string(body('Filter_array_-_Local_Update')),'Name_x002f_Title')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Description": "@replace(replace(replace(split(split(string(body('Filter_array_-_Local_Update')),'Description')[1],',')[0], '\\', ''), ':', ''), '\"', '')",
+              "Image": "@replace(replace(replace(split(split(string(body('Filter_array_-_Local_Update')),'Image')[1],',')[0], '\\', ''), ':', ''), '\"', '')\r\n\r\n\r\n\r\n\r\n\r\n"
+            }
+          }
+        },
+        "Create_HTML_table_-_Local_Update": {
+          "runAfter": {
+            "Select_-_Local_Update": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "50ed00ae-029e-453d-81e4-737005293d00"
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@body('Select_-_Local_Update')",
+            "format": "HTML"
+          }
+        },
+        "Send_an_email_(V2)": {
+          "runAfter": {
+            "Create_HTML_table_-_Local_Update": [
+              "Succeeded"
+            ],
+            "Create_HTML_table_-_IT_Training": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "67a8a2c2-700c-436c-91f6-887733773a26"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "Javier.RUIDIAZ@loreal.com",
+              "emailMessage/Subject": "TEST - TTT - Local updates - Weekly summary",
+              "emailMessage/Body": "<p>IT Trainings:<br>\n<br>\n@{body('Create_HTML_table_-_IT_Training')}<br>\n<br>\nLocal updates:<br>\n<br>\n@{body('Create_HTML_table_-_Local_Update')}</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Condition": {
+          "actions": {},
+          "runAfter": {
+            "Filter_array": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Send_an_email_-_No_updates": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "58e77b0b-5a02-434a-bc18-43c612a1d517"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_office365",
+                    "operationId": "SendEmailV2",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                  },
+                  "parameters": {
+                    "emailMessage/To": "Javier.RUIDIAZ@loreal.com",
+                    "emailMessage/Subject": "[TTT] Local Updates",
+                    "emailMessage/Body": "<p>Hi there,<br>\n<br>\nWe don't have new information to add from the local teams.<br>\n<br>\nThanks.<br>\nIT Europe &amp; Sub-Sahara - Employee Experience team</p>",
+                    "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+                    "emailMessage/Importance": "Normal"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Terminate": {
+                "runAfter": {
+                  "Send_an_email_-_No_updates": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "81afbe9b-624b-4eb4-8041-a23144e86ca0"
+                },
+                "type": "Terminate",
+                "inputs": {
+                  "runStatus": "Succeeded"
+                }
+              }
+            }
+          },
+          "expression": {
+            "greater": [
+              "@length(body('Filter_array'))",
+              "@0"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2ec29b94-613e-4ba4-a1e2-4b8b74d86c23"
+          },
+          "type": "If"
+        },
+        "Create_HTML_table_-_IT_Training": {
+          "runAfter": {
+            "Select_-_IT_Training": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "52d6ee57-bfb8-429f-bb89-7e872399f844"
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@body('Select_-_IT_Training')",
+            "format": "HTML"
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

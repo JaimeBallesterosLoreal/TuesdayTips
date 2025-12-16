@@ -1,0 +1,907 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_microsoftforms": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_microsoftforms"
+        }
+      },
+      "shared_excelonlinebusiness": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365"
+        }
+      },
+      "shared_office365users": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365users"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "When_a_new_response_is_submitted": {
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "ef315922-a163-4ec2-ad18-5f4d2e653410"
+          },
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_microsoftforms",
+              "operationId": "CreateFormWebhook",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_microsoftforms"
+            },
+            "parameters": {
+              "form_id": "2avh5MfqcUqrUtpcmYqnusHw6uTh92pMuLavlfGFkjVUQzlDSjJNVkY5RzUzRFdSQk9TMTdKSUZCVCQlQCN0PWcu"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_response_details": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "402481d4-efe6-494b-8da1-4753fc589723"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_microsoftforms",
+              "operationId": "GetFormResponseById",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_microsoftforms"
+            },
+            "parameters": {
+              "form_id": "2avh5MfqcUqrUtpcmYqnusHw6uTh92pMuLavlfGFkjVUQzlDSjJNVkY5RzUzRFdSQk9TMTdKSUZCVCQlQCN0PWcu",
+              "response_id": "@triggerOutputs()?['body/resourceData/responseId']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "XLS_URL": {
+          "runAfter": {
+            "Get_user_profile_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e78c8f83-5d6a-46d1-81e0-660ffc4c8728"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "XLS_URL",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Apply_to_each": {
+          "foreach": "@split(outputs('Get_response_details')?['body/r0f7dfe71e2bb4356976b9ba81bcd75ac'], ',')",
+          "actions": {
+            "Append_to_array_variable": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "d731d183-7d02-4ce8-9492-96c25766caa1"
+              },
+              "type": "AppendToArrayVariable",
+              "inputs": {
+                "name": "XLS_URL",
+                "value": "@items('Apply_to_each')"
+              }
+            }
+          },
+          "runAfter": {
+            "XLS_URL": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f26b89a9-5b13-4932-ae84-5beeb6c8fbb6"
+          },
+          "type": "Foreach"
+        },
+        "XLS_ID": {
+          "runAfter": {
+            "Apply_to_each": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "60597ab1-e4eb-496f-89dd-d06c3a82ea14"
+          },
+          "type": "Compose",
+          "inputs": "@split(split(variables('XLS_URL')[2],':\"')[1],'\"')[0]"
+        },
+        "List_rows_present_in_a_table": {
+          "runAfter": {
+            "XLS_ID": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7bd29795-a7ce-48b7-8076-26417519aeb4",
+            "tableId": "Table1"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness"
+            },
+            "parameters": {
+              "source": "groups/e4eaf0c1-f7e1-4c6a-b8b6-af95f1859235",
+              "drive": "b!jgfHK1gJFk6GJ6NgmrGqF7QowlWzXYpOv2LRwnkZGl8UWzgi_X9ZQpx0m0_87TPZ",
+              "file": "@outputs('XLS_ID')",
+              "table": "Table1"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "FILE_ID": {
+          "runAfter": {
+            "Get_user_profile_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a7b91caf-e984-470a-be25-ef6f70b7d91f"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "FILE_ID",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "FILE_ID_CLEAN": {
+          "runAfter": {
+            "FILE_ID": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1a1a6247-3048-47b9-a196-feffa21934f4"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "FILE_ID_CLEAN",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Apply_to_each_2": {
+          "foreach": "@split(outputs('Get_response_details')?['body/rd21f863c052449dd9dc694811b588f25'], '{')",
+          "actions": {
+            "Apply_to_each_3": {
+              "foreach": "@split(items('Apply_to_each_2'), ':')",
+              "actions": {
+                "Append_to_array_variable_2": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "02ecabb6-39be-45fb-91fd-75f23baa67fc"
+                  },
+                  "type": "AppendToArrayVariable",
+                  "inputs": {
+                    "name": "FILE_ID",
+                    "value": "@items('Apply_to_each_3')"
+                  }
+                }
+              },
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "ef59ff2a-99b9-4981-8846-18f27047725c"
+              },
+              "type": "Foreach"
+            },
+            "Append_to_array_variable_3": {
+              "runAfter": {
+                "Apply_to_each_3": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "0a8f287c-5c81-4d95-bdcc-bc4f80917a14"
+              },
+              "type": "AppendToArrayVariable",
+              "inputs": {
+                "name": "FILE_ID_CLEAN",
+                "value": "@variables('FILE_ID')[1]"
+              },
+              "description": "@{variables('FILE_ID')[4]}/@{variables('FILE_ID')[1]}"
+            },
+            "Set_variable": {
+              "runAfter": {
+                "Append_to_array_variable_3": [
+                  "Succeeded",
+                  "Failed"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "01cdec02-aac7-42be-9d0c-ba5fc956cdb9"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "FILE_ID",
+                "value": "@null"
+              }
+            }
+          },
+          "runAfter": {
+            "FILE_ID_CLEAN": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "38304f15-f588-45e7-adaf-d2fc5f2cdf44"
+          },
+          "type": "Foreach"
+        },
+        "Apply_to_each_4": {
+          "foreach": "@variables('FILE_ID_CLEAN')",
+          "actions": {
+            "Compose": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "6ec78651-e8c4-48b7-be46-c0865e35c4bd"
+              },
+              "type": "Compose",
+              "inputs": "@split(split(items('Apply_to_each_4'),'\"')[1],'\"')[0]",
+              "description": "split(split(items('Apply_to_each_4'),'\"')[1],'\"')[0]"
+            },
+            "Get_file_metadata_using_path": {
+              "runAfter": {
+                "Compose": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "48143603-718d-4699-a6bf-194086e5625c"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileMetadataByPath",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/-EMEA-EmployeeExperience",
+                  "path": "/Documents partages/Apps/Microsoft Forms/[Feedback365] - Brands Mailbox Migration (2)/Upload the list of contacts to be tagged/@{outputs('Compose')}"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Filter_array": {
+              "runAfter": {
+                "Compose_4": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "b231cdf8-64ac-4146-8647-7025f5155bc2"
+              },
+              "type": "Query",
+              "inputs": {
+                "from": "@outputs('List_rows_present_in_a_table')?['body/value']",
+                "where": "@startsWith(tolower(item()?['Name']), tolower(substring(outputs('Get_file_properties')?['body/{Name}'], 0, 9)))"
+              }
+            },
+            "Condition": {
+              "actions": {
+                "Apply_to_each_5": {
+                  "foreach": "@body('Filter_array')",
+                  "actions": {
+                    "Update_file_properties": {
+                      "runAfter": {
+                        "Create_file": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "f61fb348-c61e-4c8e-b565-d1ce16ffe1a3"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "PatchFileItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                          "table": "12075ebf-a260-4611-ba32-0bdbae0827ea",
+                          "id": "@outputs('Create_file')?['body/ItemId']",
+                          "item/Service/Value": "TTT",
+                          "item/Reference": "@replace(items('Apply_to_each_5')?['Reference'], ' ', '')",
+                          "item/Application/Value": "@outputs('Get_response_details')?['body/r138300b23fb3457b8fa6cf25d6a19c88']",
+                          "item/Feature/Value": "@outputs('Get_response_details')?['body/rc76ac2b49bff4573bf33da0ee5a4a622']",
+                          "item/Language/Value": "@replace(items('Apply_to_each_5')?['Language'], ' ', '')"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Delete_file": {
+                      "runAfter": {
+                        "Update_file_properties": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "7b902a61-c844-4d9f-8910-2934d7c279f7"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "DeleteFile",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://loreal.sharepoint.com/sites/-EMEA-EmployeeExperience",
+                          "id": "@outputs('Get_file_properties')?['body/{Identifier}']"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Get_file_metadata": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "431961f7-5965-42b5-bc19-b675051b61db"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "GetFileMetadata",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://loreal.sharepoint.com/sites/-EMEA-EmployeeExperience",
+                          "id": "@outputs('Get_file_properties')?['body/{Identifier}']"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Get_file_content": {
+                      "runAfter": {
+                        "Get_file_metadata": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "8cff69b2-0f1d-4115-bfb7-08b2fe79d7f2"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "GetFileContent",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://loreal.sharepoint.com/sites/-EMEA-EmployeeExperience",
+                          "id": "@outputs('Get_file_properties')?['body/{Identifier}']",
+                          "inferContentType": true
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Create_file": {
+                      "runAfter": {
+                        "Get_file_content": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "b3fb3b7d-06e0-4bb9-8093-b9ed1ca01d57"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "CreateFile",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                          "folderPath": "/Documents partages/TTT",
+                          "name": "@{items('Apply_to_each_5')?['Translation']}.pdf",
+                          "body": "@outputs('Get_file_content')?['body']"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      },
+                      "runtimeConfiguration": {
+                        "contentTransfer": {
+                          "transferMode": "Chunked"
+                        }
+                      }
+                    },
+                    "Append_to_array_variable_4": {
+                      "runAfter": {
+                        "Add_a_row_into_a_table": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "91403aa6-6ad0-4d62-8d07-6e37e6e0c0ba"
+                      },
+                      "type": "AppendToArrayVariable",
+                      "inputs": {
+                        "name": "Array_URLs",
+                        "value": "Name@{replace(items('Apply_to_each_5')?['Translation'], ',', '')}; Language@{replace(items('Apply_to_each_5')?['Language'], ' ', '')}; Link@{outputs('Create_sharing_link_for_a_file_or_folder')?['body/link/webUrl']};"
+                      }
+                    },
+                    "Create_sharing_link_for_a_file_or_folder": {
+                      "runAfter": {
+                        "Delete_file": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "3f521d25-e51e-4b55-b399-d463ab6f9eb0"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "CreateSharingLink",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                          "table": "12075ebf-a260-4611-ba32-0bdbae0827ea",
+                          "id": "@outputs('Update_file_properties')?['body/ID']",
+                          "permission/type": "view",
+                          "permission/scope": "organization"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Increment_variable": {
+                      "runAfter": {
+                        "Create_file": [
+                          "Failed"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "d2175a54-f2b4-4906-85e0-0c3dad76d437"
+                      },
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "Num",
+                        "value": 1
+                      }
+                    },
+                    "Add_a_row_into_a_table": {
+                      "runAfter": {
+                        "Create_sharing_link_for_a_file_or_folder": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "01PSNPNJW5ZQZ5EDNA6NHKS3QRYOATHA63": "/Tips and Tricks/TTT-Tracker.xlsx",
+                        "tableId": "{30B8A91C-FE4F-4A64-BC25-D742F5C558E5}",
+                        "operationMetadataId": "1695fa22-4c15-4c5b-8880-0c10d1d7dd33"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_excelonlinebusiness",
+                          "operationId": "AddRowV2",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness"
+                        },
+                        "parameters": {
+                          "source": "groups/e4eaf0c1-f7e1-4c6a-b8b6-af95f1859235",
+                          "drive": "b!jgfHK1gJFk6GJ6NgmrGqF7QowlWzXYpOv2LRwnkZGl8UWzgi_X9ZQpx0m0_87TPZ",
+                          "file": "01PSNPNJW5ZQZ5EDNA6NHKS3QRYOATHA63",
+                          "table": "{30B8A91C-FE4F-4A64-BC25-D742F5C558E5}",
+                          "item/Reference": "@replace(items('Apply_to_each_5')?['Reference'], ' ', '')",
+                          "item/Name": "@items('Apply_to_each_5')?['Translation']",
+                          "item/Application": "@outputs('Update_file_properties')?['body/Application/Value']",
+                          "item/Feature": "@outputs('Update_file_properties')?['body/Feature/Value']",
+                          "item/Language": "@replace(items('Apply_to_each_5')?['Language'], ' ', '')",
+                          "item/Link": "@outputs('Create_sharing_link_for_a_file_or_folder')?['body/link/webUrl']"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "c939dbb4-aba7-463f-88d4-71ea756c6e0a"
+                  },
+                  "type": "Foreach"
+                }
+              },
+              "runAfter": {
+                "Filter_array": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "greater": [
+                  "@length(body('Filter_array'))",
+                  "@0"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "9179b6b8-b0ce-42ad-bc81-e9ff23ef0a53"
+              },
+              "type": "If"
+            },
+            "Get_file_properties": {
+              "runAfter": {
+                "Get_file_metadata_using_path": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "c32c7d26-3c31-4a19-ae46-a32acff9c0b4"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileItem",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/-EMEA-EmployeeExperience",
+                  "table": "22385b14-7ffd-4259-9c74-9b4ffced33d9",
+                  "id": "@outputs('Get_file_metadata_using_path')?['body/ItemId']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Compose_2": {
+              "runAfter": {
+                "Get_file_properties": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "88e53ea6-714b-4af3-aa8e-6c8679fd36c8"
+              },
+              "type": "Compose",
+              "inputs": "@tolower(outputs('Get_file_properties')?['body/{Name}'])"
+            },
+            "Compose_4": {
+              "runAfter": {
+                "Compose_2": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "20831e44-7b5b-46be-876e-703df81d62ff"
+              },
+              "type": "Compose",
+              "inputs": "@tolower(outputs('Get_file_metadata_using_path')?['body/Name'])"
+            }
+          },
+          "runAfter": {
+            "Num": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0b18a7dc-bc45-45c0-a920-24d3c4faee10"
+          },
+          "type": "Foreach"
+        },
+        "Array_URLs": {
+          "runAfter": {
+            "Send_an_email_-_STARTED": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ef96f70c-b2ee-433e-b8b3-0af4f6b05f3f"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Array_URLs",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Send_an_email_(V2)_-_FINISHED": {
+          "runAfter": {
+            "Create_HTML_table": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "40c98410-749b-42bb-a384-37331a742c31"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+              "emailMessage/Subject": "[Tuesday's Tech Tip] - Storage - @{formatDateTime(utcNow(), 'dd/MM/yyyy')}",
+              "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\nNew tips have been added to the Tips &amp; Tricks portal:<br>\n<br>\n@{body('Create_HTML_table')}<br>\n<br>\nMany thanks.<br>\nEMEA - Employee Experience team</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Get_user_profile_(V2)": {
+          "runAfter": {
+            "Get_response_details": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0e8669c2-0d64-4f55-87c7-574e89b1a9ad"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365users",
+              "operationId": "UserProfile_V2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+            },
+            "parameters": {
+              "id": "@outputs('Get_response_details')?['body/responder']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Compose_3": {
+          "runAfter": {
+            "Apply_to_each_4": [
+              "Succeeded",
+              "Failed"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e036e555-4e30-4206-aeb9-b9ceaf45520a"
+          },
+          "type": "Compose",
+          "inputs": "@variables('Array_URLs')"
+        },
+        "Select": {
+          "runAfter": {
+            "Compose_3": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b69b5b6e-fdde-4bc0-a94e-213dd0c23b83"
+          },
+          "type": "Select",
+          "inputs": {
+            "from": "@split(string(variables('Array_URLs')), ',')",
+            "select": {
+              "Name": "@split(split(item(),'Name')[1],';')[0]",
+              "Language": "@split(split(item(),'Language')[1],';')[0]",
+              "Link": "@split(split(item(),'Link')[1],';')[0]"
+            }
+          }
+        },
+        "Num": {
+          "runAfter": {
+            "Array_URLs": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "cab4deeb-d880-4955-bd38-3a1e237a0d54"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Num",
+                "type": "integer"
+              }
+            ]
+          }
+        },
+        "Condition_2": {
+          "actions": {
+            "Send_an_email_(V2)_-_FAIL1": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "56eef8a8-11d8-4d46-b874-0418ba6f432a"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_office365",
+                  "operationId": "SendEmailV2",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                },
+                "parameters": {
+                  "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+                  "emailMessage/Subject": "[Tuesday's Tech Tip] - STORAGE - @{formatDateTime(utcNow(), 'dd/MM/yyyy')} - FAILED",
+                  "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\n[Tuesday's Tech Tip] - STORAGE automation has <span style=\"color: rgb(226,80,65)\"><strong>FAILED</strong></span>.<br>\n<br>\nThe reason is that @{variables('Num')} files already exist with that name.<br>\n<br>\nMany thanks.<br>\nEMEA - Employee Experience team</p>",
+                  "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+                  "emailMessage/Importance": "High"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Terminate": {
+              "runAfter": {
+                "Send_an_email_(V2)_-_FAIL1": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "00ddf377-3f74-4584-82eb-d2bf63702037"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Succeeded"
+              }
+            }
+          },
+          "runAfter": {
+            "Apply_to_each_4": [
+              "Failed"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Send_an_email_(V2)_-_FAIL2": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "3982642a-1706-4fb6-ae9f-f2aec646f74e"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_office365",
+                    "operationId": "SendEmailV2",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                  },
+                  "parameters": {
+                    "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+                    "emailMessage/Subject": "[Tuesday's Tech Tip] - STORAGE - @{formatDateTime(utcNow(), 'dd/MM/yyyy')} - FAILED",
+                    "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\n[Tuesday's Tech Tip] - STORAGE automation has <span style=\"color: rgb(226,80,65)\"><strong>FAILED</strong></span>.<br>\n<br>\nPlease see the logs for more information: https://emea.flow.microsoft.com/manage/environments/1fe7af08-62c2-4737-a718-79c443761ffc/solutions/cdd3673d-6014-ec11-b6e6-6045bd8b8c58/flows/6b56681f-4de9-4e28-99b2-df4d7e821ef7/details<br>\n<br>\nMany thanks.<br>\nEMEA - Employee Experience team</p>",
+                    "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+                    "emailMessage/Importance": "High"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              }
+            }
+          },
+          "expression": {
+            "greater": [
+              "@variables('Num')",
+              "@0"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7152a2a2-25a0-4fbb-900f-23d875d3bf44"
+          },
+          "type": "If"
+        },
+        "Create_HTML_table": {
+          "runAfter": {
+            "Select": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b85eb3f1-cab7-40cf-a814-23824443509d"
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@body('Select')",
+            "format": "HTML"
+          }
+        },
+        "Send_an_email_-_FAILED": {
+          "runAfter": {
+            "Send_an_email_-_STARTED": [
+              "Failed",
+              "Skipped"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fb29d78c-7ef3-445b-a827-2ddfa660b6ef"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+              "emailMessage/Subject": "[Tuesday's Tech Tip] - Storage - @{formatDateTime(utcNow(), 'dd/MM/yyyy')} - FAILED",
+              "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\n\"[Tuesday's Tech Tip] - Storage\" automation has <span style=\"color: rgb(226,80,65)\"><strong>FAILED</strong></span>.<br>\n<br>\nPlease see the logs for more information: https://emea.flow.microsoft.com/manage/environments/1fe7af08-62c2-4737-a718-79c443761ffc/solutions/cdd3673d-6014-ec11-b6e6-6045bd8b8c58/flows/6b56681f-4de9-4e28-99b2-df4d7e821ef7/details<br>\n<br>\nMany thanks.<br>\nEMEA Employee Experience team</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "High"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_an_email_-_STARTED": {
+          "runAfter": {
+            "Apply_to_each_2": [
+              "Succeeded"
+            ],
+            "List_rows_present_in_a_table": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d28a4163-ae05-40ad-bf4b-4bb4aca2b193"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+              "emailMessage/Subject": "[Tuesday's Tech Tip] - Storage - @{formatDateTime(utcNow(), 'dd/MM/yyyy')} - STARTED",
+              "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\n\"[Tuesday's Tech Tip] - Storage\" automation has <span style=\"color: rgb(251,160,38)\"><strong>STARTED</strong></span>.<br>\n<br>\nYou will receive another email once it has finished.<br>\n<br>\nMany thanks.<br>\nEMEA Employee Experience team</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

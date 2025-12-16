@@ -1,0 +1,307 @@
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25112.165" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25112.00165">
+  <Entities></Entities>
+  <Roles></Roles>
+  <Workflows>
+    <Workflow WorkflowId="{7cd07229-2c2b-ec11-b6e5-000d3a29a35c}" Name="GLOBAL - TTT - Local updates">
+      <JsonFileName>/Workflows/GLOBAL-TTT-Localupdates-7CD07229-2C2B-EC11-B6E5-000D3A29A35C.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="GLOBAL - TTT - Local updates" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{2a2517f7-312c-ec11-b6e5-000d3a29a7ff}" Name="GLOBAL - TTT - Local updates - Weekly Summary">
+      <JsonFileName>/Workflows/GLOBAL-TTT-Localupdates-WeeklySummary-2A2517F7-312C-EC11-B6E5-000D3A29A7FF.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>0</StateCode>
+      <StatusCode>1</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="GLOBAL - TTT - Local updates - Weekly Summary" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{0b868d49-2770-ef11-a670-000d3a2b7f02}" Name="GLOBAL-TTT_ExportExcel">
+      <JsonFileName>/Workflows/GLOBAL-TTT_ExportExcel-0B868D49-2770-EF11-A670-000D3A2B7F02.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="GLOBAL-TTT_ExportExcel" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{ecc5b3a4-9868-ec11-8943-000d3a38c5bf}" Name="GLOBAL - TTT - Local updates - Modify">
+      <JsonFileName>/Workflows/GLOBAL-TTT-Localupdates-Modify-ECC5B3A4-9868-EC11-8943-000D3A38C5BF.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="GLOBAL - TTT - Local updates - Modify" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{04a58a84-8f68-ec11-8943-000d3a392b8b}" Name="GLOBAL - TTT - Local updates - Weekly Summary_v2">
+      <JsonFileName>/Workflows/GLOBAL-TTT-Localupdates-WeeklySummary_v2-04A58A84-8F68-EC11-8943-000D3A392B8B.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="GLOBAL - TTT - Local updates - Weekly Summary_v2" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{d6b96e4c-73b0-ee11-a568-000d3abee5db}" Name="EUROPE - TTT Tracker - Icon update">
+      <JsonFileName>/Workflows/EUROPE-TTTTracker-Iconupdate-D6B96E4C-73B0-EE11-A568-000D3ABEE5DB.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="EUROPE - TTT Tracker - Icon update" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{fb5e0858-6014-ec11-b6e6-6045bd8b8619}" Name="[Tuesday's Tech Tip] - Storage_v2.1">
+      <JsonFileName>/Workflows/TuesdaysTechTip-Storage_v21-FB5E0858-6014-EC11-B6E6-6045BD8B8619.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="[Tuesday's Tech Tip] - Storage_v2.1" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{dd93aaad-e07b-ef11-ac20-6045bd95304b}" Name="TTT-Attachments">
+      <JsonFileName>/Workflows/TTT-Attachments-DD93AAAD-E07B-EF11-AC20-6045BD95304B.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="TTT-Attachments" />
+      </LocalizedNames>
+    </Workflow>
+    <Workflow WorkflowId="{8db3d1be-25f0-ee11-904b-6045bd97a1ca}" Name="TTTExportGallery">
+      <JsonFileName>/Workflows/TTTExportGallery-8DB3D1BE-25F0-EE11-904B-6045BD97A1CA.json</JsonFileName>
+      <Type>1</Type>
+      <Subprocess>0</Subprocess>
+      <Category>5</Category>
+      <Mode>0</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>0</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <AsyncAutodelete>0</AsyncAutodelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>1</StateCode>
+      <StatusCode>2</StatusCode>
+      <RunAs>1</RunAs>
+      <IsTransacted>1</IsTransacted>
+      <IntroducedVersion>1.0</IntroducedVersion>
+      <IsCustomizable>1</IsCustomizable>
+      <BusinessProcessType>0</BusinessProcessType>
+      <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+      <PrimaryEntity>none</PrimaryEntity>
+      <LocalizedNames>
+        <LocalizedName languagecode="1033" description="TTTExportGallery" />
+      </LocalizedNames>
+    </Workflow>
+  </Workflows>
+  <FieldSecurityProfiles></FieldSecurityProfiles>
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls />
+  <EntityDataProviders />
+  <CanvasApps>
+    <CanvasApp>
+      <Name>new_europetttappv2_d9f4b</Name>
+      <AppVersion>2025-03-12T14:14:12Z</AppVersion>
+      <Status>Ready</Status>
+      <CreatedByClientVersion>3.25024.7.0</CreatedByClientVersion>
+      <MinClientVersion>3.25024.7.0</MinClientVersion>
+      <Tags>{"primaryDeviceWidth":"1366","primaryDeviceHeight":"768","supportsPortrait":"true","supportsLandscape":"true","primaryFormFactor":"Tablet","showStatusBar":"false","publisherVersion":"3.25024.7","minimumRequiredApiVersion":"2.2.0","hasComponent":"true","hasUnlockedComponent":"true","isUnifiedRootApp":"false","sienaVersion":"20250312T141412Z-3.25024.7.0"}</Tags>
+      <IsCdsUpgraded>0</IsCdsUpgraded>
+      <GalleryItemId xsi:nil="true"></GalleryItemId>
+      <BackgroundColor>RGBA(0,176,240,1)</BackgroundColor>
+      <DisplayName>EUROPE - TTT APP - V2</DisplayName>
+      <Description xsi:nil="true"></Description>
+      <CommitMessage xsi:nil="true"></CommitMessage>
+      <Publisher xsi:nil="true"></Publisher>
+      <AuthorizationReferences>[]</AuthorizationReferences>
+      <ConnectionReferences>{"645755df-bf7c-4d21-8064-9be92ca2edb8":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1725/1.0.1725.4004/logicflows/icon.png","dataSources":["TTTExportGallery"],"dependencies":["8dac429c-371a-452b-9465-401e4e9c0c44"],"dependents":[],"parameterHints":{"workflowName":{"value":"b896a034-ba76-4bbc-90eb-c1cf02d9b0c1"},"workflowEntityId":{"value":"8db3d1be-25f0-ee11-904b-6045bd97a1ca"},"workflowDisplayName":{"value":"TTTExportGallery"},"8dac429c-371a-452b-9465-401e4e9c0c44":{"value":"shared_sharepointonline"}},"parameterHintsV2":{"workflowName":{"value":"b896a034-ba76-4bbc-90eb-c1cf02d9b0c1"},"workflowEntityId":{"value":"8db3d1be-25f0-ee11-904b-6045bd97a1ca"},"workflowDisplayName":{"value":"TTTExportGallery"},"shared_sharepointonline":{"value":"8dac429c-371a-452b-9465-401e4e9c0c44"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard"},"a02d9694-e738-466a-a92b-b3ad974166ba":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1725/1.0.1725.4004/logicflows/icon.png","dataSources":["GLOBAL-TTT_ExportExcel"],"dependencies":[],"dependents":[],"parameterHints":{"workflowName":{"value":"785060ec-e80e-47e3-900b-49528f579f0a"},"workflowEntityId":{"value":"0b868d49-2770-ef11-a670-000d3a2b7f02"},"workflowDisplayName":{"value":"GLOBAL-TTT_ExportExcel"}},"parameterHintsV2":{"workflowName":{"value":"785060ec-e80e-47e3-900b-49528f579f0a"},"workflowEntityId":{"value":"0b868d49-2770-ef11-a670-000d3a2b7f02"},"workflowDisplayName":{"value":"GLOBAL-TTT_ExportExcel"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["Run"]},"0ddf12c0-54b7-445c-8946-c352d8ea17c9":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1725/1.0.1725.4004/logicflows/icon.png","dataSources":["TTT-Attachments"],"dependencies":["8dac429c-371a-452b-9465-401e4e9c0c44"],"dependents":[],"parameterHints":{"workflowName":{"value":"0b06ee33-3cd9-4fc9-a970-8ccc3c632e65"},"workflowEntityId":{"value":"dd93aaad-e07b-ef11-ac20-6045bd95304b"},"workflowDisplayName":{"value":"TTT-Attachments"},"1f1e7b57-3ba2-460e-8210-fdcbfac5fcb8":{"value":"shared_sharepointonline"},"8dac429c-371a-452b-9465-401e4e9c0c44":{"value":"shared_sharepointonline"}},"parameterHintsV2":{"workflowName":{"value":"0b06ee33-3cd9-4fc9-a970-8ccc3c632e65"},"workflowEntityId":{"value":"dd93aaad-e07b-ef11-ac20-6045bd95304b"},"workflowDisplayName":{"value":"TTT-Attachments"},"shared_sharepointonline":{"value":"8dac429c-371a-452b-9465-401e4e9c0c44"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard"},"8dac429c-371a-452b-9465-401e4e9c0c44":{"id":"/providers/microsoft.powerapps/apis/shared_sharepointonline","displayName":"SharePoint","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1738/1.0.1738.4131/sharepointonline/icon.png","dataSources":["TuesdayTechTips-V2_User","EUROPE - TTT","TuesdayTechTips - V2"],"dependencies":[],"dependents":["645755df-bf7c-4d21-8064-9be92ca2edb8","0ddf12c0-54b7-445c-8946-c352d8ea17c9"],"parameterHints":{},"parameterHintsV2":{},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{"https://loreal.sharepoint.com/sites/employee-success":{"dataSources":{"TuesdayTechTips-V2_User":{"tableName":"bb5c49c6-5018-43bc-9340-9a32d5085d19"},"EUROPE - TTT":{"tableName":"8576c0be-51bc-40f0-8818-8169c61d7517"},"TuesdayTechTips - V2":{"tableName":"fee2f62a-d518-4bee-8bcf-7d64d9ec07fe"}}}},"apiTier":"Standard","actions":["providers/PowerPlatform.Governance/Operations/Read","providers/PowerPlatform.Governance/Operations/Write","providers/PowerPlatform.Governance/Operations/Delete"],"endpoints":[]}}</ConnectionReferences>
+      <DatabaseReferences>{}</DatabaseReferences>
+      <AppComponents>[]</AppComponents>
+      <AppComponentDependencies>[]</AppComponentDependencies>
+      <CanConsumeAppPass>0</CanConsumeAppPass>
+      <CanvasAppType>0</CanvasAppType>
+      <BypassConsent>0</BypassConsent>
+      <AdminControlBypassConsent>0</AdminControlBypassConsent>
+      <EmbeddedApp xsi:nil="true"></EmbeddedApp>
+      <IntroducedVersion>1.0</IntroducedVersion>
+      <CdsDependencies>{"cdsdependencies":[{"dependencyid":"8db3d1be-25f0-ee11-904b-6045bd97a1ca","componenttype":29,"componenttypeplatformname":"Workflow"},{"dependencyid":"0b868d49-2770-ef11-a670-000d3a2b7f02","componenttype":29,"componenttypeplatformname":"Workflow"},{"dependencyid":"dd93aaad-e07b-ef11-ac20-6045bd95304b","componenttype":29,"componenttypeplatformname":"Workflow"}]}</CdsDependencies>
+      <IsCustomizable>1</IsCustomizable>
+      <BackgroundImageUri>/CanvasApps/new_europetttappv2_d9f4b_BackgroundImageUri</BackgroundImageUri>
+      <DocumentUri>/CanvasApps/new_europetttappv2_d9f4b_DocumentUri.msapp</DocumentUri>
+      <AdditionalUris>
+        <AdditionalUri>/CanvasApps/new_europetttappv2_d9f4b_AdditionalUris0_identity.json</AdditionalUri>
+      </AdditionalUris>
+    </CanvasApp>
+  </CanvasApps>
+  <connectionreferences>
+    <connectionreference connectionreferencelogicalname="new_sharedexcelonlinebusiness_98fa8">
+      <connectionreferencedisplayname>Excel Online (Business) EUROPEEmailLaptopUpgrade-98fa8</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="new_sharedsharepointonline_7d140">
+      <connectionreferencedisplayname>SharePoint EUROPEEmailLaptopUpgrade-7d140</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_sharepointonline</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="new_sharedsharepointonline_c31a2">
+      <connectionreferencedisplayname>SharePoint</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_sharepointonline</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="new_sharedsharepointonline_feffe">
+      <connectionreferencedisplayname>SharePoint EUROPEEmailLaptopUpgrade-feffe</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_sharepointonline</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+    </connectionreference>
+  </connectionreferences>
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>

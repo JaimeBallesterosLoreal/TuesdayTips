@@ -1,0 +1,553 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_microsoftforms": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_microsoftforms"
+        }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365users": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365users"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "When_a_new_response_is_submitted": {
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "56ff6031-3f9d-4a0a-8b44-f3f5d75f46fe"
+          },
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_microsoftforms",
+              "operationId": "CreateFormWebhook",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_microsoftforms"
+            },
+            "parameters": {
+              "form_id": "2avh5MfqcUqrUtpcmYqnusHw6uTh92pMuLavlfGFkjVURVJFMllXWDQyUlYwRjlDSUE5TzhORkFFSyQlQCN0PWcu"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_response_details": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "202c6a9d-800a-40ad-a8bd-6619abefa262"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_microsoftforms",
+              "operationId": "GetFormResponseById",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_microsoftforms"
+            },
+            "parameters": {
+              "form_id": "2avh5MfqcUqrUtpcmYqnusHw6uTh92pMuLavlfGFkjVURVJFMllXWDQyUlYwRjlDSUE5TzhORkFFSyQlQCN0PWcu",
+              "response_id": "@triggerOutputs()?['body/resourceData/responseId']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Condition": {
+          "actions": {
+            "Create_item_-_Message": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "d5f7c1f8-1e9c-4aea-add3-82f4cda22b21"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PostItem",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                  "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                  "item/Title": "@utcNow()",
+                  "item/Update/Value": "Local update",
+                  "item/ZONE": "@outputs('Get_response_details')?['body/r14b7187ce434405faf3e3cdf6ff8d5c6']",
+                  "item/Country": "@{outputs('Get_response_details')?['body/r3d1e953b958a400a98d9cfbc520f4816']}@{outputs('Get_response_details')?['body/re39d11dd8e1b4daeba85be227751bb2e']}@{outputs('Get_response_details')?['body/ra9a27199d0124246a0dd27b47f226652']}@{outputs('Get_response_details')?['body/r8fb32598af0b49df919faabbe18cccbb']}@{outputs('Get_response_details')?['body/r2063a4e9522540afad0f2987ccf91108']}@{outputs('Get_response_details')?['body/rf891c1126d9f4ff69b7f5846e94c91c8']}@{outputs('Get_response_details')?['body/r83b4d9f59cfd412f85b7e640e4b9fec7']}",
+                  "item/Name_x002f_Title": "@outputs('Get_response_details')?['body/r06ca7ab01f954ff28edb819299223f14']",
+                  "item/Description": "@outputs('Get_response_details')?['body/r9e32db9045ae49c4ad5941681f5ef8ce']",
+                  "item/Speakers": [
+                    {
+                      "Claims": "@outputs('Get_response_details')?['body/responder']"
+                    }
+                  ],
+                  "item/Date": "@outputs('Get_response_details')?['body/r0b12b95d105c40a789f153d523cc4b28']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Grant_access_to_an_item_or_a_folder_-_Message": {
+              "runAfter": {
+                "Create_item_-_Message": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "d34f80fd-aee0-40b3-8503-cbbd24172b0e"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GrantAccess",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                  "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                  "id": "@outputs('Create_item_-_Message')?['body/ID']",
+                  "parameter/recipients": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+                  "parameter/roleValue": "role:1073741827"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Condition_2": {
+              "actions": {
+                "Apply_to_each": {
+                  "foreach": "@split(outputs('Get_response_details')?['body/r18dd00013fac448ba76b139dafc9e41c'], ',')",
+                  "actions": {
+                    "Append_to_array_variable": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "68382efc-d920-4344-8d06-b449c27021ce"
+                      },
+                      "type": "AppendToArrayVariable",
+                      "inputs": {
+                        "name": "Image_URL",
+                        "value": "@items('Apply_to_each')"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "8cfb3a29-5069-4afe-a0e6-df12c1ed8116"
+                  },
+                  "type": "Foreach"
+                },
+                "Image": {
+                  "runAfter": {
+                    "Apply_to_each": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "39b63061-721d-4a75-8f3e-95e326cdf916"
+                  },
+                  "type": "Compose",
+                  "inputs": "@split(split(variables('Image_URL')[1],':\"')[1],'\"')[0]"
+                },
+                "Update_item": {
+                  "runAfter": {
+                    "Image": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "c5f8a982-11f1-4a1d-b904-87de52eef661"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                      "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                      "id": "@outputs('Create_item_-_Message')?['body/ID']",
+                      "item/Image": "@outputs('Image')"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {
+                "Grant_access_to_an_item_or_a_folder_-_Message": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "greater": [
+                  "@length(outputs('Get_response_details')?['body/r18dd00013fac448ba76b139dafc9e41c'])",
+                  "@0"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "86e5c328-3018-487f-967c-c91773089c8f"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Image_URL": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Create_item_-_Training": {
+                "runAfter": {
+                  "Start_Date_andTime": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "226eb25a-fa6e-4847-9fa6-64da54f95de3"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "PostItem",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                    "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                    "item/Title": "@utcNow()",
+                    "item/Update/Value": "IT Training",
+                    "item/ZONE": "@outputs('Get_response_details')?['body/r14b7187ce434405faf3e3cdf6ff8d5c6']",
+                    "item/Country": "@{outputs('Get_response_details')?['body/r3d1e953b958a400a98d9cfbc520f4816']}@{outputs('Get_response_details')?['body/re39d11dd8e1b4daeba85be227751bb2e']}@{outputs('Get_response_details')?['body/ra9a27199d0124246a0dd27b47f226652']}@{outputs('Get_response_details')?['body/r8fb32598af0b49df919faabbe18cccbb']}@{outputs('Get_response_details')?['body/r2063a4e9522540afad0f2987ccf91108']}@{outputs('Get_response_details')?['body/rf891c1126d9f4ff69b7f5846e94c91c8']}@{outputs('Get_response_details')?['body/r83b4d9f59cfd412f85b7e640e4b9fec7']}",
+                    "item/Name_x002f_Title": "@outputs('Get_response_details')?['body/re32a56e5125f440eb4236d25b93f0bb9']",
+                    "item/Description": "@outputs('Get_response_details')?['body/r7671be8540704eceb876e3025b8b5277']",
+                    "item/Speakers": [
+                      {
+                        "Claims": "@outputs('Get_response_details')?['body/responder']"
+                      }
+                    ],
+                    "item/Date": "@outputs('Get_response_details')?['body/r8f03dbe6a7a64be6a39f8f2c9d62c1bb']",
+                    "item/Session_Duration": "@outputs('Get_response_details')?['body/rac2f787100134372a1279c10763763e0']",
+                    "item/Location/Value": "@outputs('Get_response_details')?['body/r6b3a91eed63c47c38c1be9a11bc5452e']",
+                    "item/Teams_Meeting_Link": "@outputs('Get_response_details')?['body/rf7af6eaa28674ebcb126a38bccc39e1e']"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Grant_access_to_an_item_or_a_folder_-_Training": {
+                "runAfter": {
+                  "Create_item_-_Training": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "26b3eded-c89b-4434-b815-09bdb8cac0c3"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "GrantAccess",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                    "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                    "id": "@outputs('Create_item_-_Training')?['body/ID']",
+                    "parameter/recipients": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+                    "parameter/roleValue": "role:1073741827"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Create_item_-_Event": {
+                "runAfter": {
+                  "Grant_access_to_an_item_or_a_folder_-_Training": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "0f344c52-077e-48e7-9c6d-84de58b8c16b"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "PostItem",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                    "table": "Événements",
+                    "item/Title": "@outputs('Get_response_details')?['body/re32a56e5125f440eb4236d25b93f0bb9']",
+                    "item/EventDate": "@outputs('Start_Date_andTime')",
+                    "item/EndDate": "@addMinutes(outputs('Start_Date_andTime'), int(outputs('Get_response_details')?['body/rac2f787100134372a1279c10763763e0']))",
+                    "item/ParticipantsPicker": [
+                      {
+                        "Claims": "@outputs('Get_user_profile_(V2)')?['body/mail']"
+                      }
+                    ],
+                    "item/Location": "@outputs('Create_item_-_Training')?['body/Location/Value']",
+                    "item/Description": "@outputs('Get_response_details')?['body/r7671be8540704eceb876e3025b8b5277']",
+                    "item/Workspace": "@outputs('Get_response_details')?['body/rf7af6eaa28674ebcb126a38bccc39e1e']",
+                    "item/Language/Value": "English",
+                    "item/Category/Value": "@outputs('Get_response_details')?['body/ra71064328f934d97bda592d5e0795dab']",
+                    "item/GoFromHome": false,
+                    "item/GoingHome": false,
+                    "item/Registration0/Value": ""
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Grant_access_to_an_item_or_a_folder_-_Event": {
+                "runAfter": {
+                  "Create_item_-_Event": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "3ed343ef-9094-4b5f-a0c8-625b11803c87"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "GrantAccess",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                    "table": "Événements",
+                    "id": "@outputs('Create_item_-_Event')?['body/ID']",
+                    "parameter/recipients": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+                    "parameter/roleValue": "role:1073741827"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Date": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "fa158928-cdf1-4b2f-ba7b-a817e5a038e8"
+                },
+                "type": "Compose",
+                "inputs": "@outputs('Get_response_details')?['body/r8f03dbe6a7a64be6a39f8f2c9d62c1bb']"
+              },
+              "Time": {
+                "runAfter": {
+                  "Date": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "82f4b140-8d36-491d-bb6c-3f25a69a0899"
+                },
+                "type": "Compose",
+                "inputs": "@outputs('Get_response_details')?['body/r4dc7e7e341ed4f37a0fefdc298774238']"
+              },
+              "UTC": {
+                "runAfter": {
+                  "Duration": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "99de28ba-131c-4f97-b1de-181e5bfe1cb6"
+                },
+                "type": "Compose",
+                "inputs": "@utcNow()"
+              },
+              "Duration": {
+                "runAfter": {
+                  "Time": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "f1173d34-00fa-4371-b760-ec7748414bfa"
+                },
+                "type": "Compose",
+                "inputs": "test"
+              },
+              "Update_item_-_Training": {
+                "runAfter": {
+                  "Grant_access_to_an_item_or_a_folder_-_Event": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "6e20bdf3-4711-44f3-b662-adbf56893235"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "PatchItem",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                    "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                    "id": "@outputs('Create_item_-_Training')?['body/ID']",
+                    "item/Notes": "Link to event in portal: @{outputs('Create_item_-_Event')?['body/{Link}']}"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Start_Date_andTime": {
+                "runAfter": {
+                  "UTC": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "e2a02c2d-088c-4b82-81be-0e7707823379"
+                },
+                "type": "Compose",
+                "inputs": "@{outputs('Get_response_details')?['body/r8f03dbe6a7a64be6a39f8f2c9d62c1bb']}T@{outputs('Get_response_details')?['body/r4dc7e7e341ed4f37a0fefdc298774238']}Z"
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@outputs('Get_response_details')?['body/r4c55f5662a744b349a37e1cbbb06550a']",
+              "Local update"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1df99520-7524-4dca-af4c-f4564ac52517"
+          },
+          "type": "If"
+        },
+        "Get_user_profile_(V2)": {
+          "runAfter": {
+            "Get_response_details": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1f342377-8370-4536-8969-7229c82b8811"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365users",
+              "operationId": "UserProfile_V2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+            },
+            "parameters": {
+              "id": "@outputs('Get_response_details')?['body/responder']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_an_email_-_SUCCESS": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ef7cb53a-8606-4bef-99f8-1516c265f647"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+              "emailMessage/Subject": "[Tuesday's Tech Tips] - Local update",
+              "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\nThank you for your time. The Tuesday's Tech Tip tracker has been <span style=\"color: rgb(97,189,109)\"><strong>succesfully updated.</strong></span><br>\n<br>\nRequest details:<br>\n &nbsp;&nbsp;- Reference ID: @{outputs('Create_item_-_Message')?['body/Title']}@{outputs('Create_item_-_Training')?['body/Title']}<br>\n&nbsp;&nbsp;&nbsp;- Type: @{outputs('Get_response_details')?['body/r4c55f5662a744b349a37e1cbbb06550a']}<br>\n&nbsp;&nbsp;&nbsp;- Name: @{outputs('Get_response_details')?['body/re32a56e5125f440eb4236d25b93f0bb9']}@{outputs('Get_response_details')?['body/r06ca7ab01f954ff28edb819299223f14']}<br>\n&nbsp;&nbsp;&nbsp;- Country: @{outputs('Get_response_details')?['body/r3d1e953b958a400a98d9cfbc520f4816']}@{outputs('Get_response_details')?['body/re39d11dd8e1b4daeba85be227751bb2e']}@{outputs('Get_response_details')?['body/ra9a27199d0124246a0dd27b47f226652']}@{outputs('Get_response_details')?['body/r8fb32598af0b49df919faabbe18cccbb']}@{outputs('Get_response_details')?['body/r2063a4e9522540afad0f2987ccf91108']}@{outputs('Get_response_details')?['body/rf891c1126d9f4ff69b7f5846e94c91c8']}<br>\n&nbsp;<br>\nFor more details, please follow this link: @{outputs('Create_item_-_Message')?['body/{Link}']}@{outputs('Create_item_-_Event')?['body/{Link}']}<br>\n<br>\nIf any question, please don't hesitate to get in touch.<br>\nEMEA - Employee Experience team</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_an_email_-_FAIL": {
+          "runAfter": {
+            "Condition": [
+              "Failed",
+              "Skipped"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4afd89ee-60d1-42e5-b6db-de496be7ec2d"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "@outputs('Get_user_profile_(V2)')?['body/mail']",
+              "emailMessage/Subject": "[Tuesday's Tech Tips] - Local update - FAILED",
+              "emailMessage/Body": "<p>Hi @{outputs('Get_user_profile_(V2)')?['body/givenName']},<br>\n<br>\nThe automation to update the Tuesday's Tech Tip tracker has <span style=\"color: rgb(226,80,65)\"><strong>FAILED</strong></span>.<br>\n<br>\nPlease contact us to get more information.<br>\nEMEA - Employee Experience team</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Bcc": "Javier.RUIDIAZ@loreal.com",
+              "emailMessage/Importance": "High"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Image_URL": {
+          "runAfter": {
+            "Get_user_profile_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "268d349f-9942-433d-8a8c-b11ce2bd41b8"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Image_URL",
+                "type": "array"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

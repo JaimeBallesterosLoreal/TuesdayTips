@@ -1,0 +1,476 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_7d140"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_excelonlinebusiness": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedexcelonlinebusiness_98fa8"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "7e984e1d-24b9-4574-b2eb-0d28fd41feb0"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "compose_imput",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_variable": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "a8114936-5f73-43d2-86f8-1c07dc291579"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Filename",
+                "type": "string",
+                "value": "@{utcNow()}"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_2": {
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5340fb72-2f23-4fa3-bb24-516a1286d1f5"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Loreal_Array",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Scope_formatExcelBody": {
+          "actions": {
+            "Compose": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "a1900d4f-37ab-4eac-8b66-50d2b4a660bf"
+              },
+              "type": "Compose",
+              "inputs": "@triggerBody()['text']"
+            },
+            "Parse_JSON": {
+              "runAfter": {
+                "Compose": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "bb9eef83-3065-41eb-a0de-66ee2b8b6f3a"
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@outputs('Compose')",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Status": {
+                        "type": "object",
+                        "properties": {
+                          "Value": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Product": {
+                        "type": "object",
+                        "properties": {
+                          "Value": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "Title": {
+                        "type": "string"
+                      },
+                      "Date": {
+                        "type": "string"
+                      },
+                      "Descritpcion": {
+                        "type": "string"
+                      },
+                      "Didyouknow": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Select": {
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "39bf5bc7-19b3-4ee1-a9ce-de6929f1f34c"
+              },
+              "type": "Select",
+              "inputs": {
+                "from": "@body('Parse_JSON')",
+                "select": [
+                  "@item()?['Title']",
+                  "@item()?['Date']",
+                  "@item()?['Descritpcion']",
+                  "@item()?['Didyouknow']",
+                  "@item()?['Status']?['Value']",
+                  "@item()?['Product']?['Value']"
+                ]
+              }
+            },
+            "Set_variable": {
+              "runAfter": {
+                "Select": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "d182af26-c2c1-44ee-b436-a0273f11c7f9"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "Loreal_Array",
+                "value": "@body('Select')"
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_variable_3": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6f43416a-0414-4a24-9cfd-46640364fd76"
+          },
+          "type": "Scope"
+        },
+        "Scope_createExcel": {
+          "actions": {
+            "Get_file_content": {
+              "runAfter": {},
+              "metadata": {
+                "%252fEUROPE%2b%2bTTT%252fEUROPE-TTT_Excel%252fTuesdayTechTips.xlsx": "/EUROPE  TTT/EUROPE-TTT_Excel/TuesdayTechTips.xlsx",
+                "operationMetadataId": "bdffafef-926b-46b2-b3d4-08ccaf28433c"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetFileContent",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/employee-success",
+                  "id": "%252fEUROPE%2b%2bTTT%252fEUROPE-TTT_Excel%252fTuesdayTechTips.xlsx",
+                  "inferContentType": true
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Create_file": {
+              "runAfter": {
+                "Get_file_content": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "704f7470-d70b-4251-8732-aa3c5eade99e"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "CreateFile",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/employee-success",
+                  "folderPath": "/EUROPE  TTT/EUROPE-TTT_Excel",
+                  "name": "TuesdayTechTips_@{variables('Filename')}.xlsx",
+                  "body": "@body('Get_file_content')"
+                },
+                "authentication": "@parameters('$authentication')"
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            },
+            "Apply_to_each": {
+              "foreach": "@variables('Loreal_Array')",
+              "actions": {
+                "Add_a_row_into_a_table": {
+                  "runAfter": {
+                    "Condition": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "1e6a6f14-f457-423d-8e7e-d3b2014954d3",
+                    "tableId": "TTT"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_excelonlinebusiness",
+                      "operationId": "AddRowV2",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness"
+                    },
+                    "parameters": {
+                      "source": "sites/loreal.sharepoint.com,937a6bc5-1724-4202-aae1-d49e5e3c32c4,4e7bd7d5-7e2a-4bca-8447-13f69348ac9a",
+                      "drive": "b!xWt6kyQXAkKq4dSeXjwyxNXXe04qfspLhEcT9pNIrJq-wHaFvFHwQIgYgWnGHXUX",
+                      "file": "@outputs('Create_file')?['body/Id']",
+                      "table": "TTT",
+                      "item": {
+                        "Title": "@item()[0]",
+                        "Date": "@item()[1]",
+                        "Description": "@variables('description')",
+                        "Didyouknow": "@item()[3]",
+                        "Status": "@item()[4]",
+                        "Product": "@item()[5]"
+                      }
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                },
+                "Condition": {
+                  "actions": {
+                    "Condition_2": {
+                      "actions": {
+                        "Set_variable_2": {
+                          "runAfter": {},
+                          "metadata": {
+                            "operationMetadataId": "70686b49-75da-49be-80c3-5112936a0e9e"
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "description",
+                            "value": "'@{item()[2]}"
+                          }
+                        }
+                      },
+                      "runAfter": {},
+                      "else": {
+                        "actions": {
+                          "Set_variable_4": {
+                            "runAfter": {},
+                            "metadata": {
+                              "operationMetadataId": "b27fcd6a-187d-4ae8-8c0d-c6f680c57c9c"
+                            },
+                            "type": "SetVariable",
+                            "inputs": {
+                              "name": "description",
+                              "value": "@{item()[2]}"
+                            }
+                          }
+                        }
+                      },
+                      "expression": {
+                        "or": [
+                          {
+                            "startsWith": [
+                              "@item()[2]",
+                              "="
+                            ]
+                          },
+                          {
+                            "startsWith": [
+                              "@item()[2]",
+                              "-"
+                            ]
+                          },
+                          {
+                            "startsWith": [
+                              "@item()[2]",
+                              "+"
+                            ]
+                          }
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "4635524d-fbf9-49c3-8de0-ec9814f95566"
+                      },
+                      "type": "If"
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
+                    "actions": {
+                      "Set_variable_3": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "b1ae2efc-2032-473b-bc4f-ee5bbb9ffa85"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "description",
+                          "value": "@{item()[2]}"
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "not": {
+                      "equals": [
+                        "@item()[2]",
+                        "@null"
+                      ]
+                    }
+                  },
+                  "metadata": {
+                    "operationMetadataId": "ac64b53d-2290-4593-a580-ce643a46dd71"
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "Create_file": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "c7a809a5-2367-4c30-954c-d5d5fd6ed4c0"
+              },
+              "type": "Foreach"
+            },
+            "Delay": {
+              "runAfter": {
+                "Apply_to_each": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "86dcad3f-83f0-4b23-aac7-3a02fb57179e"
+              },
+              "type": "Wait",
+              "inputs": {
+                "interval": {
+                  "count": 30,
+                  "unit": "Second"
+                }
+              }
+            },
+            "Respond_to_a_Power_App_or_flow": {
+              "runAfter": {
+                "Delay": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "b5e18a71-e662-4662-b77e-831676891383"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "urlfile": "https://loreal.sharepoint.com/sites/employee-success/@{outputs('Create_file')?['body/Path']}"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "urlfile": {
+                      "title": "urlfile",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Scope_formatExcelBody": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "36370364-3821-401d-a652-480e56958ca7"
+          },
+          "type": "Scope"
+        },
+        "Initialize_variable_3": {
+          "runAfter": {
+            "Initialize_variable_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e9e84cb0-80bf-412b-96fe-6636dda8f412"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "description",
+                "type": "string"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

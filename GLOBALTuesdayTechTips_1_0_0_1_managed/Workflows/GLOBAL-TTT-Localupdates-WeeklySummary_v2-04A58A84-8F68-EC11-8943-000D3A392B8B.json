@@ -1,0 +1,433 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Week",
+            "interval": 2,
+            "timeZone": "GMT Standard Time",
+            "schedule": {
+              "weekDays": [
+                "Monday"
+              ],
+              "hours": [
+                "9"
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "d6529e55-e9db-48eb-a844-2eacfd0b143b"
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Get_items": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "542c1b3a-4df4-4411-b2b7-fa51477749fe"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems"
+            },
+            "parameters": {
+              "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+              "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+              "folderPath": "/Lists/TTT  Local updates"
+            },
+            "authentication": "@parameters('$authentication')"
+          },
+          "runtimeConfiguration": {
+            "paginationPolicy": {
+              "minimumItemCount": 50000
+            }
+          }
+        },
+        "Filter_array": {
+          "runAfter": {
+            "Get_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6c949063-44e2-466a-a1da-2a96592c1ab7"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@outputs('Get_items')?['body/value']",
+            "where": "@and(greaterOrEquals(item()?['Date'], utcNow()),less(item()?['Date'], addDays(utcNow(), 15)))"
+          },
+          "description": "Filter by dates within the next 2 weeks"
+        },
+        "Filter_array_-_IT_Training": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0c2c3999-4045-41ba-b1dc-400c362abe5d"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Filter_array')",
+            "where": "@equals(item()?['Update/Value'], 'IT Training')"
+          }
+        },
+        "Filter_array_-_Local_Update": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "72695537-6a96-4870-884f-ca4a5d32d8b8"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Filter_array')",
+            "where": "@equals(item()?['Update/Value'], 'Local update')"
+          }
+        },
+        "Send_an_email_-_Summary": {
+          "runAfter": {
+            "Create_HTML_table_-_IT_Training": [
+              "Succeeded"
+            ],
+            "Create_HTML_table_-_Local_Update": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "67a8a2c2-700c-436c-91f6-887733773a26"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2"
+            },
+            "parameters": {
+              "emailMessage/To": "Javier.RUIDIAZ@loreal.com",
+              "emailMessage/Subject": "TTT - Local updates - Summary - @{formatDateTime(utcNow(), 'dd/MM/yyyy')}",
+              "emailMessage/Body": "<p>Hi team,<br>\n<br>\nIt's time to start preparing our next tip! Below you will find a summary of the latest information shared by the local teams:<strong><br>\n<br>\nIT Trainings:</strong><br>\n<br>\n@{body('Create_HTML_table_-_IT_Training')}<br>\n<br>\n<strong>Local updates:</strong><br>\n<br>\n@{body('Create_HTML_table_-_Local_Update')}<br>\n<br>\nFor more information, here is the link ot the Tracker: https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience/Lists/TTT%20%20Local%20updates/AllItems.aspx<br>\n<br>\nMany thanks.<br>\nEurope &nbsp;&amp; Sub-Sahara - Employee Experience team</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Condition": {
+          "actions": {},
+          "runAfter": {
+            "Filter_array": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Send_an_email_-_No_updates": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "58e77b0b-5a02-434a-bc18-43c612a1d517"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                    "connectionName": "shared_office365",
+                    "operationId": "SendEmailV2"
+                  },
+                  "parameters": {
+                    "emailMessage/To": "Javier.RUIDIAZ@loreal.com",
+                    "emailMessage/Subject": "TTT - Local updates - Summary - @{formatDateTime(utcNow(), 'dd/MM/yyyy')}",
+                    "emailMessage/Body": "<p>Hi there,<br>\n<br>\nWe don't have new information to add from the local teams.<br>\n<br>\nThanks.<br>\nIT Europe &amp; Sub-Sahara - Employee Experience team</p>",
+                    "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+                    "emailMessage/Importance": "Normal"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              },
+              "Terminate": {
+                "runAfter": {
+                  "Send_an_email_-_No_updates": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "81afbe9b-624b-4eb4-8041-a23144e86ca0"
+                },
+                "type": "Terminate",
+                "inputs": {
+                  "runStatus": "Succeeded"
+                }
+              }
+            }
+          },
+          "expression": {
+            "greater": [
+              "@length(body('Filter_array'))",
+              "@0"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2ec29b94-613e-4ba4-a1e2-4b8b74d86c23"
+          },
+          "type": "If"
+        },
+        "Create_HTML_table_-_IT_Training": {
+          "runAfter": {
+            "Filter_array_-_IT_Training": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5486dc2a-bb01-4323-9a3b-e37edc58b703"
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@body('Filter_array_-_IT_Training')",
+            "format": "HTML",
+            "columns": [
+              {
+                "header": "Type",
+                "value": "@item()?['Update']?['Value']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Country",
+                "value": "@item()?['Country']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Title",
+                "value": "@item()['Name_x002f_Title']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Description",
+                "value": "@item()?['Description']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Date",
+                "value": "@item()?['Date']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Duration",
+                "value": "@item()?['Session_Duration']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Location",
+                "value": "@item()?['Location']?['Value']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Notes",
+                "value": "@item()?['Notes']"
+              }
+            ]
+          }
+        },
+        "Create_HTML_table_-_Local_Update": {
+          "runAfter": {
+            "Filter_array_-_Local_Update": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5486dc2a-bb01-4323-9a3b-e37edc58b703"
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@body('Filter_array_-_Local_Update')",
+            "format": "HTML",
+            "columns": [
+              {
+                "header": "Type",
+                "value": "@item()?['Update']?['Value']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Country",
+                "value": "@item()?['Country']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Title",
+                "value": "@item()['Name_x002f_Title']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Description",
+                "value": "@item()?['Description']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Date",
+                "value": "@item()?['Date']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Image",
+                "value": "@item()?['Image']"
+              },
+              {
+                "header": "",
+                "value": "|"
+              },
+              {
+                "header": "Notes",
+                "value": "@item()?['Notes']"
+              }
+            ]
+          }
+        },
+        "Apply_to_each_-_IT_Training": {
+          "foreach": "@body('Filter_array_-_IT_Training')",
+          "actions": {
+            "Update_item_-_IT_Training": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "fca0f5a7-0b88-47b5-af71-af9f3ef66d5c"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                  "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                  "id": "@items('Apply_to_each_-_IT_Training')?['ID']",
+                  "item/Notes": "Included in Summary email: @{formatDateTime(utcNow(), 'dd/MM/yyyy')} | @{items('Apply_to_each_-_IT_Training')?['Notes']}"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {
+            "Send_an_email_-_Summary": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "74d164b5-e649-4421-97b8-c542fb73ff90"
+          },
+          "type": "Foreach"
+        },
+        "Apply_to_each_-_Local_Update": {
+          "foreach": "@body('Filter_array_-_Local_Update')",
+          "actions": {
+            "Update_item_-_Local_Update": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "fca0f5a7-0b88-47b5-af71-af9f3ef66d5c"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem"
+                },
+                "parameters": {
+                  "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+                  "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c",
+                  "id": "@items('Apply_to_each_-_Local_Update')?['ID']",
+                  "item/Notes": "Included in Summary email: @{formatDateTime(utcNow(), 'dd/MM/yyyy')} | @{items('Apply_to_each_-_Local_Update')?['Notes']}"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {
+            "Send_an_email_-_Summary": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "74d164b5-e649-4421-97b8-c542fb73ff90"
+          },
+          "type": "Foreach"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

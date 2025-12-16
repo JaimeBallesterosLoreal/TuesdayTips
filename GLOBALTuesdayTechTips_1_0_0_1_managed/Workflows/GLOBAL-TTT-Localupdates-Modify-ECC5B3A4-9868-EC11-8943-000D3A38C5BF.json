@@ -1,0 +1,85 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {},
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "When_an_item_is_created_or_modified": {
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Minute"
+          },
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "f2226ed2-40c7-44a4-b620-02c34e4e87fa"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetOnUpdatedItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://loreal.sharepoint.com/sites/EMEAIT-EmployeeExperience",
+              "table": "a7d3e178-d522-4ea2-8303-1e1cb98ed87c"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Send_an_email_(V2)": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "1c2f4cf9-5012-45f9-8a41-9e870fb0b04b"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "Javier.RUIDIAZ@loreal.com",
+              "emailMessage/Subject": "TTT - Local updates - Item modified",
+              "emailMessage/Body": "<p>Hi there,<br>\n<br>\nThe following entry from the TTT - Local updates tracker has been modified by @{triggerOutputs()?['body/Editor/DisplayName']}:<br>\n<br>\n &nbsp;&nbsp;&nbsp;- @{triggerOutputs()?['body/Name_x002f_Title']}: @{triggerOutputs()?['body/{Link}']}<br>\n<br>\n*Just emailing in case we were in the process of adding those details to the next email.<br>\n**If we haven't started to create the next tip, please ignore this email as the latest information will be included in the next \"TTT - Local Update - Summary Email\"<br>\n<br>\nThanks.<br>\nEurope &amp; Sub-Sahara - Employee Experience team<br>\n</p>",
+              "emailMessage/From": "emeaEmployeeExperience@loreal.com",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
